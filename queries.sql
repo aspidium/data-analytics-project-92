@@ -71,3 +71,16 @@ from salesdb.public.sales s
 left join salesdb.public.products p on p.product_id = s.product_id 
 group by 1
 order by 1;
+
+--Третий отчет о покупателях, первая покупка которых была в ходе проведения акций (акционные товары отпускали со стоимостью равной 0). 
+SELECT
+CONCAT(c.first_name,' ', c.last_name) AS customer, -- объединение имени и фамилии в одной ячейке
+MIN(s.sale_date) as sale_date,  -- поиск первой даты
+CONCAT(e.first_name,' ', e.last_name) AS seller -- объединение имени и фамилии в одной ячейке
+FROM salesdb.public.sales s 
+INNER JOIN salesdb.public.products  p  ON p.product_id  = s.product_id 
+INNER JOIN salesdb.public.customers c  ON c.customer_id = s.customer_id 
+INNER JOIN salesdb.public.employees e  ON e.employee_id = s.sales_person_id  
+WHERE p.price  = 0 --товары со стоимостью равной 0
+GROUP BY 1,3,s.customer_id
+ORDER BY s.customer_id;
