@@ -61,3 +61,13 @@ select
 FROM salesdb.public.customers c
 group by 1
 order by 1;
+
+--Второй отчет -- данные по количеству уникальных покупателей и выручке, которую они принесли
+select distinct 
+to_char(s.sale_date, 'YYYY-MM') as selling_month, -- получение даты в указанном формате
+count(s.customer_id) as total_customers, --количество покупателей
+floor (sum(p.price * s.quantity)) as income -- принесенная выручка
+from salesdb.public.sales s 
+left join salesdb.public.products p on p.product_id = s.product_id 
+group by 1
+order by 1;
