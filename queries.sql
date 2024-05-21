@@ -82,13 +82,22 @@ group by 1
 order by 1;
 
 --Второй отчет -- данные по количеству уникальных покупателей и выручке, которую они принесли
+with tab as (
+    select
+        -- получение даты в указанном формате
+        to_char(s.sale_date, 'YYYY-MM') as selling_month,
+        sum(p.price * s.quantity) as total, -- принесенная выручка
+        customer_id as cc
+    from salesdb.public.sales as s
+    inner join salesdb.public.products as p on s.product_id = p.product_id
+    group by 1, 3
+)
+
 select distinct
-    -- получение даты в указанном формате
-    to_char(s.sale_date, 'YYYY-MM') as selling_month,
-    count(s.customer_id) as total_customers, --количество покупателей
-    floor(sum(p.price * s.quantity)) as income -- принесенная выручка
-from salesdb.public.sales as s
-left join salesdb.public.products as p on s.product_id = p.product_id
+    tab.selling_month,
+    count(tab.cc) as total_customers,
+    floor(sum(tab.total)) as income
+from tab
 group by 1
 order by 1;
 
