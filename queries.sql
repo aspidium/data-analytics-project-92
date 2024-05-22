@@ -87,7 +87,7 @@ order by 1;
 --Второй отчет -- данные по количеству уникальных покупателей 
 --и выручке, которую они принесли
 with tab as (
-    select distinct
+    select
         s.customer_id as customer,
         sum(p.price * s.quantity) as total,-- принесенная выручка
         to_char(s.sale_date, 'YYYY-MM') as selling_month
@@ -95,7 +95,7 @@ with tab as (
     from salesdb.public.sales as s
     inner join salesdb.public.products as p on s.product_id = p.product_id
     group by 1, 3
-    )
+)
 
 select
     tab.selling_month,
@@ -125,7 +125,7 @@ with tab as (
     inner join
         salesdb.public.employees as e
         on s.sales_person_id = e.employee_id
-    order by c.customer_id
+    order by s.customer_id
 )
 
 select
