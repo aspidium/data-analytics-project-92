@@ -59,14 +59,14 @@ with dat as (
         salesdb.public.employees as e
         on s.sales_person_id = e.employee_id
     group by 1, 2, 4
+    order by 4, 1
 )
 
 select
     seller,
     day_of_week,
     income
-from dat
-order by dow, seller;
+from dat;
 
 --6.Анализ покупателей
 --Первый отчет - количество покупателей 
@@ -115,7 +115,7 @@ with tab as (
         concat(e.first_name, ' ', e.last_name) as seller,
         row_number()
             over (
-                partition by concat(c.first_name, c.last_name)
+                partition by c.customer_id
                 order by s.sale_date
             )
         as rn
@@ -125,7 +125,6 @@ with tab as (
     inner join
         salesdb.public.employees as e
         on s.sales_person_id = e.employee_id
-    order by s.customer_id
 )
 
 select
