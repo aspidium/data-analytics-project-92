@@ -102,16 +102,30 @@ group by 1
 order by 1;
 
 --Третий отчет о покупателях, первая покупка которых была в ходе проведения акций (акционные товары отпускали со стоимостью равной 0). 
+with tab as (
+    select
+        s.sale_date,
+        p.price,
+        concat(c.first_name, ' ', c.last_name) as customer,
+        concat(e.first_name, ' ', e.last_name) as seller,
+        row_number()
+            over (
+                partition by concat(c.first_name, c.last_name)
+                order by sale_date
+            )
+        as rn
+    from salesdb.public.sales as s
+    inner join salesdb.public.products as p on s.product_id = p.product_id
+    inner join salesdb.public.customers as c on s.customer_id = c.customer_id
+    inner join
+        salesdb.public.employees as e
+        on s.sales_person_id = e.employee_id
+    order by s.customer_id
+)
+
 select
-    -- объединение имени и фамилии в одной ячейке
-    concat(c.first_name, ' ', c.last_name) as customer,
-    min(s.sale_date) as sale_date,  -- поиск первой даты
-    -- объединение имени и фамилии в одной ячейке
-    concat(e.first_name, ' ', e.last_name) as seller
-from salesdb.public.sales as s
-inner join salesdb.public.products as p on s.product_id = p.product_id
-inner join salesdb.public.customers as c on s.customer_id = c.customer_id
-inner join salesdb.public.employees as e on s.sales_person_id = e.employee_id
-where p.price = 0 --товары со стоимостью равной 0
-group by 1, 3, s.customer_id
-order by s.customer_id;
+    tab.customer,
+    tab.sale_date,
+    tab.seller
+from tab
+where tab.price = 0 and tab.rn = 1;
