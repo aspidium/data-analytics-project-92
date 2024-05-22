@@ -90,14 +90,14 @@ with tab as (
     select
         s.customer_id as cc,
         sum(p.price * s.quantity) as total,-- принесенная выручка
-        to_char(s.sale_date, 'YYYY-MM') as selling_month        
+        to_char(s.sale_date, 'YYYY-MM') as selling_month
         -- получение даты в указанном формате
     from salesdb.public.sales as s
     inner join salesdb.public.products as p on s.product_id = p.product_id
     group by 1, 3
 )
 
-select distinct 
+select distinct
     selling_month,
     count(tab.cc) as total_customers,
     floor(sum(tab.total)) as income
